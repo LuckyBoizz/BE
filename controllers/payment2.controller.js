@@ -144,17 +144,17 @@ const handlePaymentWebhook = async (req, res) => {
     const { invoiceId, status } = req.body;
     // const signature = req.headers["x-payos-signature"];
 
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Skipping signature verification in development mode");
-    } else {
-      const isValid = await payosClient.validateSignature(signature, req.body);
-      if (!isValid) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid webhook signature",
-        });
-      }
-    }
+    // if (process.env.NODE_ENV !== "production") {
+    //   console.log("Skipping signature verification in development mode");
+    // } else {
+    //   const isValid = await payosClient.validateSignature(signature, req.body);
+    //   if (!isValid) {
+    //     return res.status(400).json({
+    //       success: false,
+    //       message: "Invalid webhook signature",
+    //     });
+    //   }
+    // }
 
     const invoice = await Invoice.findById(invoiceId);
     if (!invoice) {
