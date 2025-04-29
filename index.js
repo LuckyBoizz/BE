@@ -1,6 +1,6 @@
 // app.js
 require("dotenv").config();
-const cors = require("cors")
+const cors = require("cors");
 const express = require("express");
 // const bodyParser = require("body-parser");
 const connectDB = require("./config/database");
@@ -10,7 +10,12 @@ const app = express();
 const PORT = process.env.SERVER_PORT || 3333;
 
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
