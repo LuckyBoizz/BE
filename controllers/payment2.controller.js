@@ -1,6 +1,6 @@
 const payosClient = require("../config/payos");
 const Invoice = require("../models/invoice.model");
-const { addLoyaltyPoints } = require('../controllers/generalUser.controller');
+const { addLoyaltyPoints } = require("../controllers/generalUser.controller");
 
 const createPayment = async (req, res) => {
   try {
@@ -142,7 +142,7 @@ const confirmWebhook = async (req, res) => {
 const handlePaymentWebhook = async (req, res) => {
   try {
     const { invoiceId, status } = req.body;
-    const signature = req.headers["x-payos-signature"];
+    // const signature = req.headers["x-payos-signature"];
 
     if (process.env.NODE_ENV !== "production") {
       console.log("Skipping signature verification in development mode");
