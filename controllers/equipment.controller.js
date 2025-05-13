@@ -17,6 +17,9 @@ const getEquipment = async (req, res) => {
   try {
     const { id } = req.params;
     const equipment = await Equipment.findById(id);
+    if (!equipment) {
+      return res.status(400).json({ message: "Invalid equipment data" });
+    }
     res.status(200).json(equipment);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -50,7 +53,7 @@ const createEquipment = async (req, res) => {
       supplierId,
       title || `Nhập thiết bị mới ${new Date().toLocaleDateString("vi-VN")}`
     );
-    console.log(importResult);
+    // console.log(importResult);
     // Cập nhật thiết bị vào supplier
     const updateSupplier = await Supplier.updateOne(
       { _id: supplierId },
@@ -60,6 +63,17 @@ const createEquipment = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Cập nhật nhà cung cấp thất bại",
+      });
+    }
+    // // Cập nhật thiết bị vào type
+    const updateType = await Type.updateOne(
+      { _id: type._id },
+      { $push: { equipments: { equipmentId: equipment._id, code: code } } }
+    );
+    if (updateType.modifiedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cập nhật loại thiết bị thất bại",
       });
     }
     res.status(200).json({
@@ -97,7 +111,16 @@ const deleteEquipment = async (req, res) => {
   try {
     const { id } = req.params;
     const equipment = await Equipment.findByIdAndDelete(id);
-
+    // Delete equipment from type
+    const type = await Type.findOne({
+      equipments: { $elemMatch: { equipmentId: id } },
+    });
+    if (type) {
+      await Type.updateOne(
+        { _id: type._id },
+        { $pull: { equipments: { equipmentId: id } } }
+      );
+    }
     if (!equipment) {
       return res.status(400).json({ message: "Invalid equipment data" });
     }
@@ -137,7 +160,7 @@ const calculatePriceImportEquipment = async (equipments, supplierId, title) => {
           equipmentId: equipment._id,
           typeName: equipment.typeName,
           code: equipment.code,
-          price: equipment.price,
+          price: equipment.purchasePrice,
           description: equipment.description || "Nhập thiết bị mới",
         })),
         finalPrice: importCost,
@@ -208,7 +231,7 @@ const calculatePriceMaintenanceEquipment = async (req, res) => {
           equipmentId: equipment._id,
           typeName: equipment.typeName,
           code: equipment.code,
-          maintenancePrice: equipment.maintenancePrice,
+          price: equipment.maintenancePrice,
           description: equipment.description || "Bảo trì định kỳ",
         })),
 

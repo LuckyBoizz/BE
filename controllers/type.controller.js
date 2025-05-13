@@ -1,10 +1,23 @@
 /** @format */
 const Type = require("../models/type.model.js");
-
+const Equipment = require("../models/equipment.model.js");
 const getAllTypes = async (req, res) => {
   try {
     const type = await Type.find({});
-    res.status(200).json(type);
+    const quantity = type.map((item) => {
+      return {
+        id: item._id,
+        typeName: item.typeName,
+        count: item.count,
+        code: item.code,
+        equipments: item.equipments.map((eq) => ({
+          equipmentId: eq.equipmentId,
+          code: eq.code,
+        })),
+        quantity: item.equipments.length,
+      };
+    });
+    res.status(200).json(quantity);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -49,11 +62,18 @@ const updateType = async (req, res) => {
 const deleteType = async (req, res) => {
   try {
     const { id } = req.params;
-    const type = await Type.findByIdAndDelete(id);
-
+    const type = await Type.findById(id);
     if (!type) {
-      return res.status(400).json({ message: "Invalid type data" });
+      return res.status(404).json({ message: "Type not found" });
     }
+
+    // Delete all equipments related to this type
+    await Equipment.deleteMany({
+      _id: { $in: type.equipments.map((eq) => eq.equipmentId) },
+    });
+
+    // Delete the type
+    await Type.findByIdAndDelete(id);
 
     res.status(200).json(type);
   } catch (error) {

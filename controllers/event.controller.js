@@ -146,8 +146,8 @@ const getOngoingEvents = async (req, res) => {
 
 const getEventByDate = async (req, res) => {
   try {
-    const { date } = req.params;
-
+    const date = req.params?.date || req; // Assuming date is passed as a parameter
+    console.log(date);
     // Validate date format
     if (!moment(date, moment.ISO_8601, true).isValid()) {
       return res.status(400).json({
@@ -164,24 +164,30 @@ const getEventByDate = async (req, res) => {
     // Find events that overlap with the given date
     const events = await Event.find({
       $and: [
-        { startDate: { $lte: endDate } },
-        { endDate: { $gte: startDate } },
+        { startDate: { $lte: startDate } },
+        { endDate: { $gte: endDate } },
       ],
     });
 
-    if (!events.length) {
+    if (req.params?.date) {
+      if (!events.length) {
+        return res.status(200).json({
+          success: true,
+          message: `No events found for date ${date}`,
+          data: [],
+        });
+      }
+
       return res.status(200).json({
         success: true,
-        message: `No events found for date ${date}`,
-        data: [],
+        message: `Found ${events.length} events for date ${date}`,
+        data: events,
       });
+    } else {
+      return events;
     }
+    
 
-    return res.status(200).json({
-      success: true,
-      message: `Found ${events.length} events for date ${date}`,
-      data: events,
-    });
   } catch (error) {
     console.error("Error finding events by date:", error);
     return res.status(500).json({

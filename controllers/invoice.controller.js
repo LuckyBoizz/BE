@@ -217,6 +217,7 @@ const createInvoice = async (req, res) => {
         invoiceNumber: `INV-${shortid.generate()}`,
         customer: paymentData.customerInfo.customerId,
         orderCode: paymentData.orderCode,
+        bookingDate: paymentData.bookingDate,
         tickets: paymentData.ticketDetail.map((ticket) => ({
           ticketId: ticket.ticketId,
           ticketType: ticket.ticketType,
@@ -247,7 +248,7 @@ const createInvoice = async (req, res) => {
           code: equipment.code,
           typeName: equipment.typeName,
           description: equipment.description,
-          price: equipment.maintenancePrice,
+          price: equipment.price,
         })),
         subtotal: paymentData.finalPrice,
         status: "PENDING",

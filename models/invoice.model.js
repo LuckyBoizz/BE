@@ -19,8 +19,14 @@ const InvoiceSchema = new mongoose.Schema(
       enum: ["PENDING", "PAID", "CANCELLED"],
       default: "PENDING",
     },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    createdAt: {
+      type: Date,
+      default: () => new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    },
+    updatedAt: {
+      type: Date,
+      default: () => new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    },
   },
   { timestamps: true, discriminatorKey: "__t" }
 );

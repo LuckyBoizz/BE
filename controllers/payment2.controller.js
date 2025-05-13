@@ -166,8 +166,9 @@ const handlePaymentWebhook = async (req, res) => {
 
     invoice.status = status === "PAID" ? "PAID" : "PENDING";
     await invoice.save();
-    await addLoyaltyPoints(invoice.subtotal, invoice.customer);
-
+    if (invoice.customer != null) {
+      await addLoyaltyPoints(invoice.subtotal, invoice.customer);
+    }
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Webhook handling error:", error);

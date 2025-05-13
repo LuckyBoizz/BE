@@ -4,7 +4,7 @@ const TicketSchema = new mongoose.Schema({
   ticketType: {
     type: String,
     required: true,
-    enum: ["Normal", "Weekend"],
+    // enum: ["Normal", "Weekend", "Test"],
   },
   bonus: { type: Number, require: true, default: 0 },
   price: { type: Number, required: true, default: 0 },

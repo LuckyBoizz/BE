@@ -4,6 +4,7 @@ const Customer = require("../models/customer.model.js");
 const Event = require("../models/event.model.js");
 const {
   getTodayEvents,
+  getEventByDate,
   // getEventDiscountRate,
 } = require("./event.controller.js");
 const {
@@ -234,7 +235,7 @@ const formatNumber = (number) => Math.round(number * 100) / 100;
 const calculateTicketPayment = async (req, res) => {
   try {
     // let discountRate = 0;
-    const { tickets, customerId } = req.body;
+    const { tickets, customerId, date } = req.body;
     if (!tickets || tickets.length === 0) {
       return res.status(400).json({
         success: false,
@@ -258,8 +259,14 @@ const calculateTicketPayment = async (req, res) => {
     }
 
     let discountRate = 0;
-
-    const events = await getTodayEvents();
+    // const dateData = {
+    //   success: true,
+    //   date: date,
+    // };
+    // console.log(date);
+    // const response = await getEventByDate(dateData);
+    const events = await getEventByDate(date);
+    // console.log(events);
     if (events.length != 0) {
       for (const event of events) {
         discountRate += event.discountRate;
@@ -316,6 +323,7 @@ const calculateTicketPayment = async (req, res) => {
           cardType: customer.cardType,
         },
         ticketDetail,
+        bookingDate: date,
         summary: {
           finalPrice,
           // totalItems: tickets.reduce((sum, item) => sum + item.quantity, 0),
@@ -415,6 +423,7 @@ const calculateForNewMember = async (req, res) => {
           customerId: null,
           cardType: null,
         },
+        bookingDate: new Date(),
         ticketDetail,
         summary: {
           finalPrice,

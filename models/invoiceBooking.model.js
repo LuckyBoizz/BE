@@ -1,12 +1,20 @@
 // models/invoiceBooking.js
 const mongoose = require("mongoose");
 const Invoice = require("./invoice.model");
+const moment = require("moment");
 
 const InvoiceBookingSchema = new mongoose.Schema({
   customer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Customer",
     // required: true,
+  },
+  bookingDate: {
+    type: Date,
+      required: true,
+      get: function (date) {
+        return date ? moment(date).format("DD-MM-YYYY") : null;
+      },
   },
   tickets: [
     {

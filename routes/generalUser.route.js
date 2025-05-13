@@ -9,6 +9,7 @@ const {
   updateGeneralUser,
   deleteGeneralUser,
   loginGeneralUser,
+  forgotPassword,
   // logoutGeneralUser,
   // refreshToken,
 } = require("../controllers/generalUser.controller.js");
@@ -26,6 +27,8 @@ router.put("/update/:id", updateGeneralUser);
 router.delete("/:id", deleteGeneralUser);
 
 router.post("/login", loginGeneralUser);
+
+router.post("/forgot-password", forgotPassword);
 
 // router.post("/logout", logoutGeneralUser);
 
